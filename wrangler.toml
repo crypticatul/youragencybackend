@@ -1,0 +1,16 @@
+name = "youragencybackend"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+DATABASE_URL = "postgresql://neondb_owner:npg_9YrXjuAsRDb6@ep-blue-butterfly-a86vb92m-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
+ACCESS_TOKEN_SECRET = "2d8160bb0ee01e9bd2ecdea83b48ed72b08b1473a3e61e4920711363bd39ded5"
+VAPI_API_KEY = "a0007276-a29f-4d69-aead-7a4c66f4c91b"
+
+[build]
+command = "npm run build"
+
+[placement]
+mode = "smart"
