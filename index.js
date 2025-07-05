@@ -12,10 +12,10 @@ const winston = require("winston");
 const { Resend } = require("resend");
 const { PrismaClient, UserType } = require("@prisma/client");
 const crypto = require("crypto");
-const axios = require("axios");
-const assistantRoutes=require("./routes/assistant.routes")
-const voiceaiAssistantRoute=require("./routes/voiceai")
-
+const assistantRoutes = require("./routes/assistant.routes");
+const voiceaiAssistantRoute = require("./routes/voiceai");
+const knowledgeBaseRoute = require("./routes/knowledgebase.routes");
+const voiceAIProxyRoute = require("./routes/voiceAIProxyRoute");
 require("dotenv").config();
 
 const prisma = new PrismaClient();
@@ -61,6 +61,7 @@ const allowedOrigins = [
   "http://localhost:8080",
   "https://voice.cognitiev.com",
   "https://youragency2.netlify.app",
+  "https://propai.cognitiev.com",
 ];
 
 app.use(
@@ -141,7 +142,7 @@ const isPasswordStrong = (password) =>
 
 const generateAccessToken = (email, type) =>
   jwt.sign({ email, type }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "2h",
   });
 
 const generateRefreshToken = (email, type) =>
@@ -203,12 +204,10 @@ app.post(
       });
 
       auditLog(email, "Registered");
-      res
-        .status(201)
-        .json({
-          message: "Registered successfully",
-          csrfToken: req.csrfToken(),
-        });
+      res.status(201).json({
+        message: "Registered successfully",
+        csrfToken: req.csrfToken(),
+      });
     } catch (error) {
       logger.error("Register error:", error);
       res.status(500).json({ message: "Server error" });
@@ -282,12 +281,10 @@ app.post(
       attemptData.count >= MAX_OTP_ATTEMPTS &&
       Date.now() - attemptData.lastAttemptTime < LOCKOUT_DURATION
     ) {
-      return res
-        .status(429)
-        .json({
-          message:
-            "Account locked due to multiple failed OTP attempts. Try after some time.",
-        });
+      return res.status(429).json({
+        message:
+          "Account locked due to multiple failed OTP attempts. Try after some time.",
+      });
     }
 
     try {
@@ -338,7 +335,7 @@ app.post(
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-          maxAge: 60 * 60 * 1000,
+          maxAge: 2 * 60 * 60 * 1000,
         })
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
@@ -385,7 +382,7 @@ app.post("/auth/refresh-token", async (req, res) => {
         httpOnly: true,
         sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
         secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 1000,
+        maxAge: 2 * 60 * 60 * 1000,
       })
       .json({ message: "Token refreshed" });
   } catch (error) {
@@ -405,9 +402,19 @@ app.post("/auth/logout", async (req, res) => {
 
     await prisma.refreshToken.deleteMany({ where: { token } });
 
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-    res.status(200).json({ message: "Logged out" });
+    res
+      .clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      })
+      .clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      })
+      .status(200)
+      .json({ message: "Logged out" });
   } catch (error) {
     logger.error("Logout error:", error);
     res.status(500).json({ message: "Server error" });
@@ -462,12 +469,10 @@ app.post(
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         // To avoid user enumeration, respond with 200 anyway
-        return res
-          .status(200)
-          .json({
-            message:
-              "If an account with that email exists, a reset link has been sent.",
-          });
+        return res.status(200).json({
+          message:
+            "If an account with that email exists, a reset link has been sent.",
+        });
       }
 
       // Generate token and expiry (1 hour)
@@ -484,12 +489,10 @@ app.post(
       await sendResetPasswordEmail(email, token);
       auditLog(email, "Requested password reset");
 
-      res
-        .status(200)
-        .json({
-          message:
-            "If an account with that email exists, a reset link has been sent.",
-        });
+      res.status(200).json({
+        message:
+          "If an account with that email exists, a reset link has been sent.",
+      });
     } catch (error) {
       logger.error("Forgot password error:", error);
       res.status(500).json({ message: "Server error" });
@@ -644,7 +647,6 @@ app.get("/privacy-policy", (req, res) => {
   res.json({ url: "https://yourdomain.com/privacy-policy" });
 });
 
-
 // === Update Vapi Agent ===
 app.patch("/api/vapi/agent/:id", async (req, res) => {
   const token = req.cookies.accessToken;
@@ -688,61 +690,23 @@ app.patch("/api/vapi/agent/:id", async (req, res) => {
     );
 
     auditLog(decoded.email, `Updated Vapi agent ${req.params.id}`);
-    res.status(200).json({ message: "Agent updated successfully", data: vapiResponse.data });
+    res
+      .status(200)
+      .json({ message: "Agent updated successfully", data: vapiResponse.data });
   } catch (error) {
     logger.error("Vapi agent update failed:", error);
     res.status(500).json({ message: "Failed to update Vapi agent" });
   }
 });
+
 app.use("/api/assistants", assistantRoutes);
-app.use("/voiceai",voiceaiAssistantRoute);
+app.use("/voiceai", voiceaiAssistantRoute);
+app.use("/api/knowledge-base", knowledgeBaseRoute);
 
-// === Calls API Endpoint ===
-app.get("/api/voiceai/call", async (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json({ message: "Not logged in" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    
-    const VAPI_API_KEY = process.env.VAPI_API_KEY;
-    if (!VAPI_API_KEY) {
-      return res.status(500).json({ message: "VoiceAI API key not set in environment variables" });
-    }
-
-    // Build query parameters for Vapi API
-    const queryParams = new URLSearchParams();
-    
-    // Pass through all query parameters from the frontend
-    if (req.query.assistantId) queryParams.append('assistantId', req.query.assistantId);
-    if (req.query.createdAtGt) queryParams.append('createdAtGt', req.query.createdAtGt);
-    if (req.query.createdAtLt) queryParams.append('createdAtLt', req.query.createdAtLt);
-    if (req.query.limit) queryParams.append('limit', req.query.limit);
-    if (req.query.offset) queryParams.append('offset', req.query.offset);
-
-    const vapiUrl = `https://api.vapi.ai/call${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-    
-    console.log(`Fetching calls from Vapi: ${vapiUrl}`);
-
-    const vapiResponse = await axios.get(vapiUrl, {
-      headers: {
-        Authorization: `Bearer ${VAPI_API_KEY}`,
-      },
-    });
-
-    auditLog(decoded.email, `Fetched calls data with params: ${queryParams.toString()}`);
-    res.status(200).json(vapiResponse.data);
-  } catch (error) {
-    console.error("Error fetching calls from Vapi:", error?.response?.data || error.message);
-    res.status(error.response?.status || 500).json({
-      message: "Failed to fetch calls from Vapi",
-      details: error.response?.data || error.message,
-    });
-  }
-});
+app.use("/api/voiceai", voiceAIProxyRoute);
 
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8787;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
