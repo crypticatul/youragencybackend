@@ -1,8 +1,8 @@
 {
   "name": "youragencybackend",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
+    "start": "node index.js",
     "build": "prisma generate",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
@@ -12,11 +12,22 @@
   "dependencies": {
     "@neondatabase/serverless": "^0.9.0",
     "@prisma/client": "^5.7.1",
+    "axios": "^1.6.0",
+    "bcrypt": "^5.1.0",
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "csurf": "^1.11.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
     "hono": "^4.8.3",
     "jose": "^6.0.0",
-    "resend": "^4.6.0"
+    "jsonwebtoken": "^9.0.2",
+    "resend": "^4.6.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "prisma": "^5.7.1",

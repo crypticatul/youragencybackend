@@ -12,6 +12,7 @@ const winston = require("winston");
 const { Resend } = require("resend");
 const { PrismaClient, UserType } = require("@prisma/client");
 const crypto = require("crypto");
+const axios = require("axios");
 const assistantRoutes=require("./routes/assistant.routes")
 const voiceaiAssistantRoute=require("./routes/voiceai")
 
@@ -695,6 +696,50 @@ app.patch("/api/vapi/agent/:id", async (req, res) => {
 });
 app.use("/api/assistants", assistantRoutes);
 app.use("/voiceai",voiceaiAssistantRoute);
+
+// === Calls API Endpoint ===
+app.get("/api/voiceai/call", async (req, res) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json({ message: "Not logged in" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    
+    const VAPI_API_KEY = process.env.VAPI_API_KEY;
+    if (!VAPI_API_KEY) {
+      return res.status(500).json({ message: "VoiceAI API key not set in environment variables" });
+    }
+
+    // Build query parameters for Vapi API
+    const queryParams = new URLSearchParams();
+    
+    // Pass through all query parameters from the frontend
+    if (req.query.assistantId) queryParams.append('assistantId', req.query.assistantId);
+    if (req.query.createdAtGt) queryParams.append('createdAtGt', req.query.createdAtGt);
+    if (req.query.createdAtLt) queryParams.append('createdAtLt', req.query.createdAtLt);
+    if (req.query.limit) queryParams.append('limit', req.query.limit);
+    if (req.query.offset) queryParams.append('offset', req.query.offset);
+
+    const vapiUrl = `https://api.vapi.ai/call${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    
+    console.log(`Fetching calls from Vapi: ${vapiUrl}`);
+
+    const vapiResponse = await axios.get(vapiUrl, {
+      headers: {
+        Authorization: `Bearer ${VAPI_API_KEY}`,
+      },
+    });
+
+    auditLog(decoded.email, `Fetched calls data with params: ${queryParams.toString()}`);
+    res.status(200).json(vapiResponse.data);
+  } catch (error) {
+    console.error("Error fetching calls from Vapi:", error?.response?.data || error.message);
+    res.status(error.response?.status || 500).json({
+      message: "Failed to fetch calls from Vapi",
+      details: error.response?.data || error.message,
+    });
+  }
+});
 
 // Start Server
 const PORT = process.env.PORT || 5000;
