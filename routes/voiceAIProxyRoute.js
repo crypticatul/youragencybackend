@@ -103,46 +103,86 @@ async function proxyRequest(req, res, endpointPath, methodOverride = null) {
 
 // === Routes ===
 
-// CALL
+// CALL - Optimized version with smart limits
 router.get("/call", async (req, res) => {
   const origin = req.headers.origin;
   const corsHeaders = getCorsHeaders(origin);
 
-  const {
-    id,
-    assistantId,
-    phoneNumberId,
-    limit,
-    createdAtGt,
-    createdAtLt,
-    createdAtGe,
-    createdAtLe,
-    updatedAtGt,
-    updatedAtLt,
-    updatedAtGe,
-    updatedAtLe,
-  } = req.query;
+  try {
+    const { fetchCallsOptimized } = require("../services/voiceaiService");
+    
+    const {
+      assistantId,
+      createdAtGt,
+      createdAtLt,
+      days, // New parameter for time period optimization
+    } = req.query;
 
-  const queryParams = new URLSearchParams();
-  if (id) queryParams.append("id", id);
-  if (assistantId) queryParams.append("assistantId", assistantId);
-  if (phoneNumberId) queryParams.append("phoneNumberId", phoneNumberId);
+    // Determine time period for optimization
+    let timePeriod = days;
+    if (!timePeriod && createdAtGt && createdAtLt) {
+      // Calculate days difference if not provided
+      const start = new Date(createdAtGt);
+      const end = new Date(createdAtLt);
+      const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays <= 7) timePeriod = "7";
+      else if (diffDays <= 30) timePeriod = "30";
+      else if (diffDays <= 60) timePeriod = "60";
+      else timePeriod = "all";
+    }
 
-  // Use provided limit or default to 1000
-  queryParams.append("limit", limit || "200");
+    // Use optimized service
+    const result = await fetchCallsOptimized({
+      assistantId,
+      days: timePeriod || "30",
+      customStartDate: createdAtGt,
+      customEndDate: createdAtLt,
+    });
 
-  if (createdAtGt) queryParams.append("createdAtGt", createdAtGt);
-  if (createdAtLt) queryParams.append("createdAtLt", createdAtLt);
-  if (createdAtGe) queryParams.append("createdAtGe", createdAtGe);
-  if (createdAtLe) queryParams.append("createdAtLe", createdAtLe);
-  if (updatedAtGt) queryParams.append("updatedAtGt", updatedAtGt);
-  if (updatedAtLt) queryParams.append("updatedAtLt", updatedAtLt);
-  if (updatedAtGe) queryParams.append("updatedAtGe", updatedAtGe);
-  if (updatedAtLe) queryParams.append("updatedAtLe", updatedAtLe);
+    res.set(corsHeaders);
+    res.status(200).json(result.calls);
 
-  const proxiedUrl = queryParams.toString() ? `/call?${queryParams.toString()}` : "/call";
+  } catch (error) {
+    console.error("Optimized call fetch error:", error);
+    
+    // Fallback to original implementation if optimized fails
+    const {
+      id,
+      assistantId,
+      phoneNumberId,
+      limit,
+      createdAtGt,
+      createdAtLt,
+      createdAtGe,
+      createdAtLe,
+      updatedAtGt,
+      updatedAtLt,
+      updatedAtGe,
+      updatedAtLe,
+    } = req.query;
 
-  await proxyRequest(req, res, proxiedUrl, "GET");
+    const queryParams = new URLSearchParams();
+    if (id) queryParams.append("id", id);
+    if (assistantId) queryParams.append("assistantId", assistantId);
+    if (phoneNumberId) queryParams.append("phoneNumberId", phoneNumberId);
+
+    // Use provided limit or default to 200
+    queryParams.append("limit", limit || "200");
+
+    if (createdAtGt) queryParams.append("createdAtGt", createdAtGt);
+    if (createdAtLt) queryParams.append("createdAtLt", createdAtLt);
+    if (createdAtGe) queryParams.append("createdAtGe", createdAtGe);
+    if (createdAtLe) queryParams.append("createdAtLe", createdAtLe);
+    if (updatedAtGt) queryParams.append("updatedAtGt", updatedAtGt);
+    if (updatedAtLt) queryParams.append("updatedAtLt", updatedAtLt);
+    if (updatedAtGe) queryParams.append("updatedAtGe", updatedAtGe);
+    if (updatedAtLe) queryParams.append("updatedAtLe", updatedAtLe);
+
+    const proxiedUrl = queryParams.toString() ? `/call?${queryParams.toString()}` : "/call";
+
+    await proxyRequest(req, res, proxiedUrl, "GET");
+  }
 });
 
 

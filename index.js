@@ -12,6 +12,7 @@ const winston = require("winston");
 const { Resend } = require("resend");
 const { PrismaClient, UserType } = require("@prisma/client");
 const crypto = require("crypto");
+const axios = require("axios");
 const assistantRoutes = require("./routes/assistant.routes");
 const voiceaiAssistantRoute = require("./routes/voiceai");
 const knowledgeBaseRoute = require("./routes/knowledgebase.routes");
@@ -704,6 +705,7 @@ app.use("/voiceai", voiceaiAssistantRoute);
 app.use("/api/knowledge-base", knowledgeBaseRoute);
 
 app.use("/api/voiceai", voiceAIProxyRoute);
+app.use("/api/charts", require("./routes/charts.routes"));
 
 // Start Server
 const PORT = process.env.PORT || 8787;
