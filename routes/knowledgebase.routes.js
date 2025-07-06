@@ -1,11 +1,11 @@
-// routes/knowlegdebase.routes.js
+// routes/knowledgebase.routes.js
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { createKnowledgeBase } = require("../services/voiceaiService");
 
 const router = express.Router();
 
-router.post("/knowledge-base", async (req, res) => {
+router.post("/", async (req, res) => {
   const token = req.cookies.accessToken;
   if (!token) {
     return res.status(401).json({ message: "Not logged in" });

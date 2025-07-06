@@ -1,34 +1,38 @@
 {
-  "name": "your-agency-backend",
+  "name": "youragencybackend",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "dev": "node index.js",
-    "prisma:generate": "prisma generate",
-    "build": "npx prisma generate",
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "prisma generate",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@prisma/client": "^6.9.0",
-    "axios": "^1.10.0",
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
+    "@neondatabase/serverless": "^0.9.0",
+    "@prisma/client": "^5.7.1",
+    "@vapi-ai/server-sdk": "^0.10.0",
+    "axios": "^1.6.0",
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^3.0.2",
+    "cookie": "^1.0.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "express-rate-limit": "^7.5.0",
-    "express-validator": "^7.2.1",
-    "helmet": "^8.1.0",
+    "dotenv": "^17.0.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "hono": "^4.8.3",
+    "jose": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^7.0.3",
-    "prisma": "^6.9.0",
     "resend": "^4.6.0",
-    "winston": "^3.17.0"
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.7.1",
+    "wrangler": "^4.0.0"
   }
 }

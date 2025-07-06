@@ -303,3 +303,23 @@
 {"level":"info","message":"OTP saved successfully for pandeysatyam1708@gmail.com","timestamp":"2025-06-26T12:57:44.084Z"}
 {"level":"info","message":"OTP sent to pandeysatyam1708@gmail.com","timestamp":"2025-06-26T12:57:46.030Z"}
 {"level":"info","message":{"action":"OTP sent","email":"pandeysatyam1708@gmail.com","timestamp":"2025-06-26T12:57:46.031Z"},"timestamp":"2025-06-26T12:57:46.031Z"}
+{"level":"info","message":"Updating OTP for user: pandeysatyam1708@gmail.com with hash: $2b$10$r6U4Jw4Q/hugu8gArxTIA.Dbgc36Y/DcKsgNiPUcs5RcAADakfI3O expiry: Fri Jul 04 2025 13:20:25 GMT+0530 (India Standard Time)","timestamp":"2025-07-04T07:45:25.809Z"}
+{"level":"info","message":"OTP saved successfully for pandeysatyam1708@gmail.com","timestamp":"2025-07-04T07:45:26.380Z"}
+{"level":"info","message":"OTP sent to pandeysatyam1708@gmail.com","timestamp":"2025-07-04T07:45:27.729Z"}
+{"level":"info","message":{"action":"OTP sent","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-04T07:45:27.729Z"},"timestamp":"2025-07-04T07:45:27.729Z"}
+{"level":"info","message":{"action":"Logged in","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-04T07:45:41.064Z"},"timestamp":"2025-07-04T07:45:41.064Z"}
+{"level":"info","message":"Updating OTP for user: pandeysatyam1708@gmail.com with hash: $2b$10$kCy5SjhuQuqpH57vhremWuJ9IxKctgxY1mASJwmSztq15.Qk7g.b6 expiry: Fri Jul 04 2025 13:57:04 GMT+0530 (India Standard Time)","timestamp":"2025-07-04T08:22:04.959Z"}
+{"level":"info","message":"OTP saved successfully for pandeysatyam1708@gmail.com","timestamp":"2025-07-04T08:22:05.407Z"}
+{"level":"info","message":"OTP sent to pandeysatyam1708@gmail.com","timestamp":"2025-07-04T08:22:07.061Z"}
+{"level":"info","message":{"action":"OTP sent","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-04T08:22:07.061Z"},"timestamp":"2025-07-04T08:22:07.061Z"}
+{"level":"info","message":{"action":"Logged in","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-04T08:22:28.971Z"},"timestamp":"2025-07-04T08:22:28.971Z"}
+{"level":"info","message":"Updating OTP for user: pandeysatyam1708@gmail.com with hash: $2b$10$BP9B6bUolLUXViDVDpvaQ.lfdYAOOglYY0UMShIHHUrsCpeL4Hb5G expiry: Fri Jul 04 2025 15:27:04 GMT+0530 (India Standard Time)","timestamp":"2025-07-04T09:52:04.551Z"}
+{"level":"info","message":"OTP saved successfully for pandeysatyam1708@gmail.com","timestamp":"2025-07-04T09:52:05.000Z"}
+{"level":"info","message":"OTP sent to pandeysatyam1708@gmail.com","timestamp":"2025-07-04T09:52:06.196Z"}
+{"level":"info","message":{"action":"OTP sent","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-04T09:52:06.196Z"},"timestamp":"2025-07-04T09:52:06.196Z"}
+{"level":"info","message":{"action":"Logged in","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-04T09:52:20.623Z"},"timestamp":"2025-07-04T09:52:20.623Z"}
+{"level":"info","message":"Updating OTP for user: pandeysatyam1708@gmail.com with hash: $2b$10$vh/pbWv2Q3UjxLcwL5eQ5eh9xNM1fhLP2LLmsysFhBXRfZv5xHiwS expiry: Sat Jul 05 2025 23:34:08 GMT+0530 (India Standard Time)","timestamp":"2025-07-05T17:59:08.055Z"}
+{"level":"info","message":"OTP saved successfully for pandeysatyam1708@gmail.com","timestamp":"2025-07-05T17:59:08.631Z"}
+{"level":"info","message":"OTP sent to pandeysatyam1708@gmail.com","timestamp":"2025-07-05T17:59:10.460Z"}
+{"level":"info","message":{"action":"OTP sent","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-05T17:59:10.460Z"},"timestamp":"2025-07-05T17:59:10.460Z"}
+{"level":"info","message":{"action":"Logged in","email":"pandeysatyam1708@gmail.com","timestamp":"2025-07-05T17:59:26.057Z"},"timestamp":"2025-07-05T17:59:26.057Z"}
