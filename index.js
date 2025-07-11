@@ -61,6 +61,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8080",
   "https://voice.cognitiev.com",
+  "https://voice2.cognitiev.com",
+  "https://voice3.cognitiev.com",
   "https://youragency2.netlify.app",
   "https://propai.cognitiev.com",
 ];
